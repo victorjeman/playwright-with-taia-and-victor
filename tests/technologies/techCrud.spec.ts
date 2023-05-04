@@ -25,25 +25,32 @@ test.describe("Verify CRUD operations on Technologies page", () => {
     await expect(newTechNameCell).toHaveText(newTechName, { timeout: 30000 });
   });
 
-  test("Check that user is able to edit a technology successfuly", () => {});
-
-  test.only("Check that user is able to delete a technology from the table", async ({
+  test.only("Check that user is able to edit a technology successfuly", async ({
     page,
   }) => {
-    if (
-      (await page
-        .getByRole("cell", { name: techToBeDeleted })
-        .last()
-        .innerText()) == techToBeDeleted
-    ) {
-      await page.getByText("Delete").last().click();
-      const alertText = await page.getByRole("alert").innerText();
-      console.log(alertText);
-      await expect(await page.getByRole("cell").last().innerText).not.toEqual(
-        techToBeDeleted
-      );
-    } else {
-      await expect(0).toEqual(1);
-    }
+    await page
+      .getByRole("row", { name: techToEdit })
+      .last()
+      .getByRole("button", { name: "Edit" })
+      .click();
+    await page.getByLabel("Technology name").fill("editedValue");
+    await page.getByRole("button", { name: "Update" }).click();
+    await expect(
+      await page.getByRole("row", { name: "editedValue" })
+    ).toBeTruthy();
+  });
+
+  test("Check that user is able to delete a technology from the table", async ({
+    page,
+  }) => {
+    await page
+      .getByRole("row", { name: techToBeDeleted })
+      .getByRole("button", { name: "Delete" })
+      .click();
+    const alertText = await page.getByRole("alert").innerText();
+    console.log(alertText);
+    await expect(await page.getByRole("cell").last().innerText).not.toEqual(
+      techToBeDeleted
+    );
   });
 });
